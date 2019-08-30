@@ -1,10 +1,16 @@
 // listen for auth status changes
 auth.onAuthStateChanged((user) => {
 	if (user) {
-		console.log('user just logged in: ', user);
+		// get data
+		db.collection('guide').get().then((snapshot) => {
+			setupGuides(snapshot.docs);
+			setupUI(user);
+			console.log(snapshot.docs);
+		});
 	}
 	else {
-		console.log('user logged out');
+		setupUI();
+		setupGuides([]);
 	}
 });
 
