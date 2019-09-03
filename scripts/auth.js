@@ -1,16 +1,10 @@
 // listen for auth status changes
 auth.onAuthStateChanged((user) => {
 	if (user) {
-		// get data
-		db.collection('guide').get().then((snapshot) => {
-			setupGuides(snapshot.docs);
-			setupUI(user);
-			console.log(snapshot.docs);
-		});
+		console.log('user just logged in: ', user);
 	}
 	else {
-		setupUI();
-		setupGuides([]);
+		console.log('user logged out');
 	}
 });
 
@@ -51,6 +45,7 @@ loginForm.addEventListener('submit', (e) => {
 	const password = loginForm['login-password'].value;
 	auth.signInWithEmailAndPassword(email, password).then((cred) => {
 		// console.log(cred.user);
+		// close the log in modal and reset the form
 		const modal = document.querySelector('#modal-login');
 		M.Modal.getInstance(modal).close();
 		loginForm.reset();
