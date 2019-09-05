@@ -1,17 +1,29 @@
 // get data
-db.collection('guides').get().then((snapshot) => {
-	setupGuides(snapshot.docs);
-	console.log(snapshot.docs);
-});
 
 // listen for auth status changes
 auth.onAuthStateChanged((user) => {
 	if (user) {
+		db.collection('guides').get().then((snapshot) => {
+			setupGuides(snapshot.docs);
+			setupUI(user);
+		});
 		console.log('user just logged in: ', user);
 	}
 	else {
+		setupUI();
+		setupGuides([]);
 		console.log('user logged out');
 	}
+});
+
+// create new guide
+const createForm = document.querySelector('#create-form');
+createForm.addEventListener('submit', (e) => {
+	e.preventDefault();
+	db.collection('guides').add({
+		title   : createForm['title'].value,
+		content : createForm['content'].value
+	});
 });
 
 // signup
