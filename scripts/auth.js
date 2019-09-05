@@ -3,14 +3,18 @@
 // listen for auth status changes
 auth.onAuthStateChanged((user) => {
 	if (user) {
-		db.collection('guides')
-			.onSnapshot((snapshot) => {
+		db.collection('guides').onSnapshot(
+			(snapshot) => {
 				setupGuides(snapshot.docs);
 				setupUI(user);
-			})
-			.catch((err) => {
+			},
+			(err) => {
 				console.log(err.message);
-			});
+			}
+		);
+		// .catch((err) => {
+		// 	console.log(err.message);
+		// });
 		console.log('user just logged in: ', user);
 	}
 	else {
@@ -51,13 +55,20 @@ signupForm.addEventListener('submit', (e) => {
 	const password = signupForm['signup-password'].value;
 	console.log(email, password);
 	// sign up the user
-	auth.createUserWithEmailAndPassword(email, password).then((cred) => {
-		// console.log(cred.user);
-		// close the signup modal & reset form
-		const modal = document.querySelector('#modal-signup');
-		M.Modal.getInstance(modal).close();
-		signupForm.reset();
-	});
+	auth
+		.createUserWithEmailAndPassword(email, password)
+		.then((cred) => {
+			// console.log(cred.user);
+			return db.collection('users').doc(cred.user.uid).set({
+				bio : signupForm['signup-bio'].value
+			});
+		})
+		.then(() => {
+			// close the signup modal & reset form
+			const modal = document.querySelector('#modal-signup');
+			M.Modal.getInstance(modal).close();
+			signupForm.reset();
+		});
 });
 
 // logout
